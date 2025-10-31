@@ -1,5 +1,5 @@
 import argparse
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, abort
 
 # Initialize a Flask app
 app = Flask(__name__)
@@ -68,6 +68,17 @@ MOCK_MODELS = {
     ],
 }
 
+# Predefined API key for authentication
+VALID_API_KEY = "your_api_key_here"  # Replace with your actual API key
+
+# Middleware to check for API key in the headers
+@app.before_request
+def require_api_key():
+    api_key = request.headers.get('Authorization')  # Check the 'Authorization' header
+    if not api_key or api_key != f"Bearer {VALID_API_KEY}":
+        # If the API key is missing or invalid, return a 401 Unauthorized error
+        abort(401, description="Unauthorized: Invalid or missing API key")
+
 # Define the endpoint for GET /v1/models
 @app.route('/v1/models', methods=['GET'])
 def get_models():
@@ -84,7 +95,16 @@ if __name__ == '__main__':
         default=5000,
         help="Port to run the server on. Default is 5000."
     )
+    parser.add_argument(
+        '--api-key',
+        type=str,
+        help="Set the API key required to access the server.",
+        required=True  # Make the API key a mandatory argument
+    )
     args = parser.parse_args()
+
+    # Assign the API key from the command-line arguments
+    VALID_API_KEY = args.api_key
 
     # Run the Flask app on the specified port
     app.run(debug=True, port=args.port)
