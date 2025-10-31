@@ -68,7 +68,7 @@ MOCK_MODELS = {
     ],
 }
 
-# Predefined API key for authentication
+# A placeholder for the API key
 VALID_API_KEY = "your_api_key_here"  # Replace with your actual API key
 
 # Middleware to check for API key in the headers
@@ -96,15 +96,22 @@ if __name__ == '__main__':
         help="Port to run the server on. Default is 5000."
     )
     parser.add_argument(
+        '--ip',
+        type=str,
+        default="127.0.0.1",
+        help="IP address to run the server on. Default is 127.0.0.1."
+    )
+    parser.add_argument(
         '--api-key',
         type=str,
         help="Set the API key required to access the server.",
         required=True  # Make the API key a mandatory argument
     )
+
     args = parser.parse_args()
 
     # Assign the API key from the command-line arguments
     VALID_API_KEY = args.api_key
 
-    # Run the Flask app on the specified port
-    app.run(debug=True, port=args.port)
+    # Run the Flask app on the specified IP and port
+    app.run(debug=True, host=args.ip, port=args.port)
